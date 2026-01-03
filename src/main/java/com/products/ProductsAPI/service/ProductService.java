@@ -2,6 +2,7 @@ package com.products.ProductsAPI.service;
 
 import com.products.ProductsAPI.domain.entity.ProductModel;
 import com.products.ProductsAPI.repository.ProductRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,10 +19,15 @@ public class ProductService {
         return productRepository.save(productModel);
     }
 
+    @Cacheable(value = "Allproducts")
     public List<ProductModel> listAll(){
         return productRepository.findAll();
     }
 
+    @Cacheable(
+            value = "products",
+            key = "'id=' + #id + ':name=' + #name"
+    )
     public List<ProductModel> search(String id, String name){
 
         if(id != null && name != null){
