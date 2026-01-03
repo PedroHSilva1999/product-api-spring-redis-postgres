@@ -24,4 +24,22 @@ public class ProductController {
         return productService.listAll();
     }
 
+    @GetMapping("/search")
+    public List<ProductModel> search(@RequestParam(name = "id",required = false) String id,
+            @RequestParam(name = "name",required = false) String name){
+
+        return productService.search(id,name);
+    }
+
+    @PutMapping("{id}")
+    public ProductModel update(@PathVariable String id,
+                               @RequestBody ProductModel productModel){
+        return productService.update(id, productModel);
+    }
+
+    @DeleteMapping("{id}")
+    public void delete(@PathVariable String id){
+        productService.delete(id);
+    }
+
 }
