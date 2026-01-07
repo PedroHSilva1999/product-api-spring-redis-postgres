@@ -26,5 +26,5 @@ public class ProductModel {
     private Double price;
     @Column
     @CreationTimestamp
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 }

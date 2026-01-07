@@ -1,6 +1,9 @@
 package com.products.ProductsAPI.service;
 
 import com.products.ProductsAPI.domain.entity.ProductModel;
+import com.products.ProductsAPI.dto.ProductMapper;
+import com.products.ProductsAPI.dto.ProductRequestDTO;
+import com.products.ProductsAPI.dto.ProductResponseDTO;
 import com.products.ProductsAPI.repository.ProductRepository;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -15,29 +18,32 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public ProductModel save(ProductModel productModel){
-        return productRepository.save(productModel);
+    public ProductResponseDTO save(ProductRequestDTO productRequestDTO){
+        ProductModel productModel = ProductMapper.toEntity(productRequestDTO);
+        ProductModel saved = productRepository.save(productModel);
+        return ProductMapper.toDTO(saved);
+
     }
 
     @Cacheable(value = "Allproducts")
-    public List<ProductModel> listAll(){
-        return productRepository.findAll();
+    public List<ProductResponseDTO> listAll(){
+        return productRepository.findAll().stream().map(ProductMapper::toDTO).toList();
     }
 
     @Cacheable(
             value = "products",
             key = "'id=' + #id + ':name=' + #name"
     )
-    public List<ProductModel> search(String id, String name){
+    public List<ProductResponseDTO> search(String id, String name){
 
         if(id != null && name != null){
-            return productRepository.findByIdAndName(id,name );
+            return productRepository.findByIdAndName(id,name).stream().map(ProductMapper::toDTO).toList();
         }
         if (id != null){
-            return productRepository.findById(id).stream().toList();
+            return productRepository.findById(id).stream().map(ProductMapper::toDTO).toList();
         }
         if (name != null){
-            return productRepository.findByName(name);
+            return productRepository.findByName(name).stream().map(ProductMapper::toDTO).toList();
         }
         return null;
 
@@ -45,9 +51,10 @@ public class ProductService {
 
     }
 
-    public ProductModel update(String id, ProductModel productModel){
+    public ProductResponseDTO update(String id, ProductModel productModel){
         productModel.setId(id);
-        return productRepository.save(productModel);
+        var saved = productRepository.save(productModel);
+        return ProductMapper.toDTO(saved);
     }
 
     public void delete(String id){
